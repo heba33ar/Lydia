@@ -19,15 +19,65 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
 { to scaff
 
     public AppDbContext CreateDbContext(string[] args)
+=======
+/// (using ACPP.Api.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace ACPP.Api.Data;
+
+public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+{
+    public DbSet<Client>       Clients       { get; set; }
+    public DbSet<AdminUser>    AdminUsers    { get; set; }
+    public DbSet<FormSection>  Forms         { get; set; }
+    public DbSet<DocumentFile> Documents     { get; set; }
+    public DbSet<EmailLog>     EmailLogs     { get; set; }
+    public DbSet<WebhookEvent> WebhookEvents { get; set; }
+    public DbSet<Complaint>      Complaints      { get; set; }
+    public DbSet<Event>          Events          { get; set; }
+    public DbSet<Contract>        Contracts        { get; set; }
+    public DbSet<ContractEvent>   ContractEvents   { get; set; }
+    public DbSet<Recommendation>   Recommendations   { get; set; }
+    public DbSet<HelpMediaAsset>   HelpMediaAssets   { get; set; }
+    public DbSet<Notification>     Notifications     { get; set; }
+    public DbSet<AdminAuditLog>    AuditLogs         { get; set; }
+    public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder b)
     {
-        var conn = Environment.GetEnvironmentVariable("ACPP_DB_CONNECTION")
-                   ?? "Host=localhost;Port=5432;Database=acpp;Username=acpp;Password=acpp";
+        // ── Prospects (Client entity) ────────────────────────────────
+        b.Entity<Client>(e =>
+        {
+            e.HasKey(c => c.Id);
+            // Email is intentionally NOT unique — two prospects/clients may share
+            // the same address (e.g. spouses, same household). The login handle
+            // is `prospect_ref`, which is unique.
+            e.HasIndex(c => c.Email);
+            e.HasIndex(c => c.ProspectRef).IsUnique();
+            e.HasIndex(c => c.MandataireId);
+            e.Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            e.Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseNpgsql(conn)
             .Options;
  options = 
         return new AppDbContext(options);
+            e.HasOne(c => c.Mandataire)
+             .WithMany()
+             .HasForeignKey(c => c.MandataireId)
+             .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // ── Admin Users ──────────────────────────────────────────────
+        b.Entity<AdminUser>(e =>
+        {
+            e.HasKey(a => a.Id);
+            e.HasIndex(a => a.Email).IsUnique();
+            e.Property(a => a.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            e.Property(a => a.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+        });
+ntext(options);
     }
 }
 
