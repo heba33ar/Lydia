@@ -13,6 +13,13 @@ namespace ACPP.Api.Data;
 /// The connection string here is a placeholder — `migrations add` only needs a
 /// provider to scaffold SQL and does NOT connect to a database. `database update`
 /// would connect, so pass a real one via ACPP_DB_CONNECTION or run the app
+/// (which applies migrations automatically on Postgres).
+/// </summary>
+public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
+{ to scaff
+
+    public AppDbContext CreateDbContext(string[] args)
+=======
 /// (using ACPP.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,6 +58,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             e.Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseNpgsql(conn)
+            .Options;
+ options = 
+        return new AppDbContext(options);
             e.HasOne(c => c.Mandataire)
              .WithMany()
              .HasForeignKey(c => c.MandataireId)
@@ -68,3 +80,4 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 ntext(options);
     }
 }
+
