@@ -16,7 +16,8 @@ namespace ACPP.Api.Data;
 /// (which applies migrations automatically on Postgres).
 /// </summary>
 public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
-{
+{ to scaff
+
     public AppDbContext CreateDbContext(string[] args)
     {
         var conn = Environment.GetEnvironmentVariable("ACPP_DB_CONNECTION")
@@ -25,7 +26,8 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseNpgsql(conn)
             .Options;
-
+ options = 
         return new AppDbContext(options);
     }
 }
+
