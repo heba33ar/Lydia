@@ -1,1 +1,31 @@
-modif de ma branch
+modif de ma branch jzodjoz
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+
+namespace ACPP.Api.Data;
+
+/// <summary>
+/// Design-time factory used ONLY by the EF Core CLI (`dotnet ef migrations …`,
+/// `dotnet ef database update`). It forces the <b>Npgsql</b> provider so the
+/// generated migrations target PostgreSQL, independent of the runtime
+/// environment or connection string. It is never used at runtime.
+///
+/// The connection string here is a placeholder — `migrations add` only needs a
+/// provider to scaffold SQL and does NOT connect to a database. `database update`
+/// would connect, so pass a real one via ACPP_DB_CONNECTION or run the app
+/// (which applies migrations automatically on Postgres).
+/// </summary>
+public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
+{
+    public AppDbContext CreateDbContext(string[] args)
+    {
+        var conn = Environment.GetEnvironmentVariable("ACPP_DB_CONNECTION")
+                   ?? "Host=localhost;Port=5432;Database=acpp;Username=acpp;Password=acpp";
+
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseNpgsql(conn)
+            .Options;
+
+        return new AppDbContext(options);
+    }
+}
